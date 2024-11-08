@@ -9,9 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.CoinList.CoinListScreen
+import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.CoinList.CoinListViewModel
 import dev.devlopment.cryptocurrencytraker.ui.theme.CryptoCurrencyTrakerTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +25,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CryptoCurrencyTrakerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                Scaffold(modifier = Modifier.fillMaxSize().padding(top = 36.dp)){ innerPadding ->
+                    val viewModel= koinViewModel<CoinListViewModel>()
+                    val state by viewModel.state.collectAsStateWithLifecycle()
+                    CoinListScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        state = state
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CryptoCurrencyTrakerTheme {
-        Greeting("Android")
     }
 }
