@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.devlopment.cryptocurrencytraker.Core.Navigation.AdaptiveCoinListDetailPane
 import dev.devlopment.cryptocurrencytraker.Core.Presentation.Utils.ObserveAsEvents
 import dev.devlopment.cryptocurrencytraker.Core.Presentation.Utils.toString
 import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.CoinList.CoinListEvent
@@ -28,36 +29,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CryptoCurrencyTrakerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize().padding(top = 36.dp)){ innerPadding ->
-                    val viewModel= koinViewModel<CoinListViewModel>()
-                    val state by viewModel.state.collectAsStateWithLifecycle()
-                    val context = LocalContext.current
-                    ObserveAsEvents(events = viewModel.events) {event->
-                        when(event){
-                            is CoinListEvent.Error ->{
-                                Toast.makeText(
-                                    context,
-                                    event.error.toString(context),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                    when{
-                        state.selectedCoin!=null->{
-                            CoinDetailScreen(
-                                state = state,
-                                modifier = Modifier.padding(innerPadding),
-                            )
-                        }
-                        else->{
-                            CoinListScreen(
-                                modifier = Modifier.padding(innerPadding),
-                                state = state,
-                                onAction = viewModel::onAction
-                            )
-                        }
-                    }
+                Scaffold(modifier = Modifier.fillMaxSize()){ innerPadding ->
+                   AdaptiveCoinListDetailPane(
+                       modifier = Modifier.padding(innerPadding),
+                   )
                 }
             }
         }
