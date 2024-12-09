@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dev.devlopment.cryptocurrencytraker.Core.Domain.Utils.onError
 import dev.devlopment.cryptocurrencytraker.Core.Domain.Utils.onSuccess
 import dev.devlopment.cryptocurrencytraker.Crypto.Domain.CoinDataSource
+import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.Coin_detail.DataPoint
+import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.Models.CoinUi
 import dev.devlopment.cryptocurrencytraker.Crypto.Presentation.Models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +16,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class CoinListViewModel(
     private val coinDataSource: CoinDataSource
@@ -30,12 +34,48 @@ class CoinListViewModel(
 
     private val _events=Channel<CoinListEvent>()
     val events=_events.receiveAsFlow()
-    private fun onAction(action: CoinListAction){
+    fun onAction(action: CoinListAction){
         when(action){
-            is CoinListAction.onCoinClick -> CoinListAction.onCoinClick(action.coinUi)
-            is CoinListAction.onRefresh -> {
-                loadCoins()
+            is CoinListAction.OnCoinClick -> {
+                selectCoin(action.coinUi)
             }
+        }
+    }
+
+    private fun selectCoin(coinUi: CoinUi){
+        _state.update {
+            it.copy(
+                selectedCoin = coinUi
+            )
+        }
+        viewModelScope.launch {
+            coinDataSource
+                .getCoinHistory(
+                    coinId = coinUi.id,
+                    start = ZonedDateTime.now().minusDays(5),
+                    end = ZonedDateTime.now()
+                )
+                .onSuccess { history->
+                    val dataPoints = history
+                        .sortedBy { it.dateTime }
+                        .map {
+                            DataPoint(
+                                x=it.dateTime.hour.toFloat(),
+                                y=it.priceUsd.toFloat() ,
+                                xLabel = DateTimeFormatter.ofPattern("ha\nM/d").format(it.dateTime)
+                            )
+                        }
+                    _state.update {
+                        it.copy(
+                            selectedCoin = it.selectedCoin?.copy(
+                                coinPriceHistory = dataPoints
+                            )
+                        )
+                    }
+                }
+                .onError {error->
+                    _events.send(CoinListEvent.Error(error))
+                }
         }
     }
     private fun loadCoins(){
@@ -47,7 +87,6 @@ class CoinListViewModel(
 
                 )
             }
-
             coinDataSource
                 .getCoins()
                 .onSuccess {coins->
@@ -66,7 +105,6 @@ class CoinListViewModel(
                     }
                     _events.send(CoinListEvent.Error(error))
                 }
-
         }
     }
 }

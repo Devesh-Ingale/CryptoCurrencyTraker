@@ -2,7 +2,7 @@ package dev.devlopment.cryptocurrencytraker.Core.Data.Networking
 
 import dev.devlopment.cryptocurrencytraker.BuildConfig
 
-fun ConstructURL(url:String):String{
+fun constructURL(url:String):String{
     return when
     {
         url.contains(BuildConfig.BASE_URL) -> url

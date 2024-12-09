@@ -41,7 +41,7 @@ fun CoinListItem(
     }
     Row (
         modifier = Modifier
-            .clickable { onClick }
+            .clickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -87,10 +87,10 @@ fun CoinListItem(
 @Composable
 private fun CoinListItemPreview() {
     CryptoCurrencyTrakerTheme {
-        CoinListItem(previewCoin,{},
-            modifier = Modifier.background(
-                MaterialTheme.colorScheme.background
-            )
+        CoinListItem(
+            coinUi = previewCoin,
+            onClick = {},
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
 }
@@ -102,5 +102,5 @@ internal val previewCoin= Coin(
     symbol = "BTC",
     marketCapUsd = 1241273958896.75,
     priceUsd = 62828.15,
-    changePercent24Hr = 0.1
+    changePercent24Hr = -0.1
 ).toCoinUi()

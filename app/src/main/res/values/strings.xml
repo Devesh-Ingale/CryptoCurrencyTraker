@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">CryptoCurrencyTraker</string>
+    <string name="error_request_timeout" />
+    <string name="error_too_many_requests">Oops, its seems your kota exhausted</string>
+    <string name="error_no_internet_connection">Check your Internet Connection</string>
+    <string name="error_server_error">Server chrashed</string>
+    <string name="error_unknown_error">Something went wromg, Please try again later</string>
+    <string name="error_serialization">Couldn\'t serialize and deseralize the data</string>
+    <string name="marketCap">Market Cap</string>
+    <string name="price">Price</string>
+    <string name="ChangeLas24Hr">Change Last 24h</string>
 </resources>
